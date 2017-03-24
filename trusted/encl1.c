@@ -1,5 +1,8 @@
+#include <sys/types.h>
 #include <stdarg.h>
 #include <stdio.h>      /* vsnprintf */
+#include <stdlib.h>
+#include <string.h>
 
 #include "encl1.h"
 #include "encl1_t.h"  /* print_string */
@@ -143,12 +146,12 @@ void encl1_AES_GCM_encrypt(char *p_src,uint32_t src_len,char *p_des,uint32_t des
     uint32_t aad_len;
 
     p_key = gcm_key;
-    p_des = (char *)malloc(sizeof(char)*1000);
+//    p_des = (char *)malloc(sizeof(char)*1000);
     p_iv = gcm_iv;
     iv_len = 12;
     p_aad = NULL;
     aad_len = 0;
-    p_mac = (sgx_aes_gcm_128bit_tag_t *)malloc(sizeof(sgx_aes_gcm_128bit_tag_t)*1000);
+//    p_mac = (sgx_aes_gcm_128bit_tag_t *)malloc(sizeof(sgx_aes_gcm_128bit_tag_t)*1000);
 
     ret = sgx_rijndael128GCM_encrypt(p_key, p_src, src_len, p_des, p_iv, iv_len, p_aad, aad_len, p_mac);
 
@@ -162,20 +165,20 @@ void encl1_AES_GCM_encrypt(char *p_src,uint32_t src_len,char *p_des,uint32_t des
        print_error_message(ret);
     }
 
-    char *p_plain;
-    p_plain = (char *)malloc(sizeof(char)*1000);
-    ret = sgx_rijndael128GCM_decrypt(p_key, p_des, src_len, p_plain, p_iv, iv_len, p_aad, aad_len, p_mac);
-
-    if (ret == SGX_SUCCESS){
-       printf("AES GCM decryption success!\n");
-       printf("Encrypted txt: %s\n", p_des);
-       printf("Decrypted txt: %s\n", p_plain);
-       printf("MAC: %s\n", p_mac);
-    }
-    else{
-       print_error_message(ret);
-    }
-
+//    char *p_plain;
+//    p_plain = (char *)malloc(sizeof(char)*1000);
+//    ret = sgx_rijndael128GCM_decrypt(p_key, p_des, src_len, p_plain, p_iv, iv_len, p_aad, aad_len, p_mac);
+//
+//    if (ret == SGX_SUCCESS){
+//       printf("AES GCM decryption success!\n");
+//       printf("Encrypted txt: %s\n", p_des);
+//       printf("Decrypted txt: %s\n", p_plain);
+//       printf("MAC: %s\n", p_mac);
+//    }
+//    else{
+//       print_error_message(ret);
+//    }
+    printf("enclave gcm encrypt!\n");
 }
 
 void encl1_AES_GCM_decrypt(char *p_src,uint32_t src_len,char *p_des,uint32_t des_len, sgx_aes_gcm_128bit_tag_t *p_mac)
@@ -188,7 +191,7 @@ void encl1_AES_GCM_decrypt(char *p_src,uint32_t src_len,char *p_des,uint32_t des
     uint32_t aad_len;
 
     p_key = gcm_key;
-    p_des = (char *)malloc(sizeof(char)*1000);
+//    p_des = (char *)malloc(sizeof(char)*1000);
     p_iv = gcm_iv;
     iv_len = 12;
     p_aad = NULL;
@@ -209,21 +212,63 @@ void encl1_AES_GCM_decrypt(char *p_src,uint32_t src_len,char *p_des,uint32_t des
     else{
        print_error_message(ret);
     }
-
+    printf("enclave GCM decrypt\n");
 }
 
-void ecall_encl1_update_operation(char *key, int *flag, int* vlen, char *value, char *value_update)
+void ecall_encl1_update_operation(char *key, int *flag, int* vlen, char *value, char *value_update, int tlen)
 {
-    char *value_plain, *value_encrypt;
+    char *key_plain, *value_plain, *value_enc, *key_enc, *update_enc;
     sgx_aes_gcm_128bit_tag_t *p_mac;
     printf("value in enclave:\n");
-    printf("%s\n",value);
-    printf("vlen : %d\n",*vlen);
-
-    encl1_AES_GCM_encrypt(value, *vlen, value_encrypt, *vlen, p_mac);
-
-//    encl1_AES_GCM_decrypt(value_encrypt, *vlen, value_plain, *vlen, p_mac);
-
+    printf("len:%d, key:%s\n",strlen(key),key);
+    printf("len:%d, value:%s\n",strlen(value),value);
+    printf("len:%d, value_update:%s\n",strlen(value_update),value_update);
+    key_enc = (unsigned char *)malloc(sizeof(unsigned char)*500);
+    key_plain = (unsigned char *)malloc(sizeof(unsigned char)*500);
+    value_plain = (unsigned char *)malloc(sizeof(unsigned char)*1000);
+    value_enc = (unsigned char *)malloc(sizeof(unsigned char)*1000);
+    update_enc =  (unsigned char *)malloc(sizeof(unsigned char)*1000);
+    p_mac = (sgx_aes_gcm_128bit_tag_t *)malloc(sizeof(sgx_aes_gcm_128bit_tag_t));
+   
+    //decrypt key
+    printf("Begin copy p_mac\n");
+    strncpy(p_mac, key, 16);
+    printf("End copy p_mac\n");
+    strncpy(key_enc,key+16,strlen(key)-16);
+    encl1_AES_GCM_decrypt(key_enc, strlen(key_enc), key_plain, strlen(key_enc), p_mac);
+    printf("decrypted key:%s\n",key_plain);
+    printf("strlen(key):%d\n",strlen(key_plain));
+    
+    //decrypt value 
+    strncpy(p_mac, value, 16);
+    strncpy(value_enc,value+16,strlen(value)-16-2);
+    encl1_AES_GCM_decrypt(value_enc, strlen(value_enc), value_plain, strlen(value_enc), p_mac);
+    printf("decrypted value:%s\n",value_plain+24);
+    printf("strlen(value):%d\n",strlen(value_plain+24));
+    memset(value,0,*vlen);   
+    strncpy(value,value_plain,strlen(value_plain)); 
+    
+  
+    //decrypt value_update
+    strncpy(p_mac, value_update, 16);
+    strncpy(update_enc,value_update+16,strlen(value_update)-16-2);
+    encl1_AES_GCM_decrypt(update_enc, strlen(update_enc), value_plain, strlen(update_enc), p_mac);
+    printf("decrypted value:%s\n",value_plain+48);
+    printf("strlen(value):%d\n",strlen(value_plain+48));
+    strncat(value,value_plain+48,strlen(value_plain+48));
+    printf("cyx strlen(value):%d\n",strlen(value));   
+    encl1_AES_GCM_encrypt(value, strlen(value), value_enc, strlen(value), p_mac);
+    printf("appended value:%s\n",value);
+    printf("cyx enc strlen(value_enc):%d\n",strlen(value_enc));
+    memset(value,0,strlen(value_enc)+16+2);
+    strncpy(value,p_mac,16);
+    strncpy(value+16,value_enc,strlen(value_enc));
+    strcat(value,"\r\n");
+    printf("encrypted value:%s\n",value);
+//    encl1_AES_GCM_decrypt(value+16,strlen(value+16), value_plain, strlen(value+16), p_mac);
+//    printf("decrypted value:%s\n",value_plain);
+    printf("strlen(value):%d\n",strlen(value));   
+    printf("enclave update operations!\n");
 }
 
 void ecall_encl1_AES_GCM_decrypt(const char *p_src, uint32_t src_len, char *p_dec, uint32_t *dec_len)

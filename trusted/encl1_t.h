@@ -17,7 +17,7 @@ extern "C" {
 
 
 void ecall_encl1_AES_GCM_decrypt(const char* p_src, uint32_t src_len, char* p_dec, uint32_t* dec_len);
-void ecall_encl1_update_operation(char* key, int* flag, int* vlen, char* value, char* value_update);
+void ecall_encl1_update_operation(char* key, int* flag, int* vlen, char* value, char* value_update, int tlen);
 
 sgx_status_t SGX_CDECL ocall_encl1_sample(const char* str);
 

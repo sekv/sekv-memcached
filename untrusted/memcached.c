@@ -333,16 +333,16 @@ int initialize_enclave(void)
 
     /* Step 2: call sgx_create_enclave to initialize an enclave instance */
     /* Debug Support: set 2nd parameter to 1 */
-
+    printf("before sgx create\n");
     ret = sgx_create_enclave(ENCL1_FILENAME, SGX_DEBUG_FLAG, &token, &updated, &global_eid, NULL);
-
+    printf("after sgx create\n");
     if (ret != SGX_SUCCESS) {
         print_error_message(ret);
         if (fp != NULL) fclose(fp);
 
         return -1;
     }
-
+    printf("sgx return success\n");
     /* Step 3: save the launch token if it is updated */
 
     if (updated == FALSE || fp == NULL) {
@@ -2787,8 +2787,22 @@ static void _store_item_copy_data(int comm, item *old_it, item *new_it, item *ad
             _store_item_copy_chunks(new_it, old_it, old_it->nbytes - 2);
             _store_item_copy_chunks(new_it, add_it, add_it->nbytes);
         } else {
-            memcpy(ITEM_data(new_it), ITEM_data(old_it), old_it->nbytes);
-            memcpy(ITEM_data(new_it) + old_it->nbytes - 2 /* CRLF */, ITEM_data(add_it), add_it->nbytes);
+//            memcpy(ITEM_data(new_it), ITEM_data(old_it), old_it->nbytes);
+//            memcpy(ITEM_data(new_it) + old_it->nbytes - 2 /* CRLF */, ITEM_data(add_it), add_it->nbytes);
+          printf("append command!\n");
+          /*SGX code begin*/        
+          sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+          char *cyx_value;
+          uint32_t cyx_flag,cyx_vlen,transfer_len;
+          cyx_flag = (uint32_t) strtoul(ITEM_suffix(old_it), (char **) NULL, 10);
+          cyx_vlen = old_it->nbytes;
+          cyx_value = (unsigned char *)malloc(sizeof(unsigned char)*1000);
+          memcpy(cyx_value,ITEM_data(old_it),old_it->nbytes);
+          transfer_len = old_it->nbytes + add_it->nbytes;
+          ret = ecall_encl1_update_operation(global_eid, ITEM_key(old_it),&cyx_flag,&cyx_vlen,cyx_value,ITEM_data(add_it),transfer_len); 
+          memcpy(ITEM_data(new_it),cyx_value,strlen(cyx_value));
+          printf("strlen(cyx_value):%d\n",strlen(cyx_value));
+          /*SGX code end*/
         }
     } else {
         /* NREAD_PREPEND */
@@ -2800,23 +2814,23 @@ static void _store_item_copy_data(int comm, item *old_it, item *new_it, item *ad
             memcpy(ITEM_data(new_it) + add_it->nbytes - 2 /* CRLF */, ITEM_data(old_it), old_it->nbytes);
         }
     }
-/* sgx code begin */
-    sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-    int cyx_flag, cyx_vlen;
-    char *sgx_buf;
-    cyx_flag = 0;
-//    cyx_vlen = 0;
-    sgx_buf = ITEM_data(old_it);
-    cyx_vlen = strlen(sgx_buf);
-    ret = ecall_encl1_update_operation(global_eid, sgx_buf, &cyx_flag, &cyx_vlen, sgx_buf, sgx_buf);
-    if (ret == SGX_SUCCESS){
-        printf("SGX Enclave decypt success.\n");
-      //  printf("dec_len:%d\n",dec_len);
-    }
-    else{
-        print_error_message(ret);
-    }
-/* sgx code end */    
+///* sgx code begin */
+//    sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+//    int cyx_flag, cyx_vlen;
+//    char *sgx_buf;
+//    cyx_flag = 0;
+////    cyx_vlen = 0;
+//    sgx_buf = ITEM_data(old_it);
+//    cyx_vlen = strlen(sgx_buf);
+//    ret = ecall_encl1_update_operation(global_eid, sgx_buf, &cyx_flag, &cyx_vlen, sgx_buf, sgx_buf);
+//    if (ret == SGX_SUCCESS){
+//        printf("SGX Enclave decypt success.\n");
+//      //  printf("dec_len:%d\n",dec_len);
+//    }
+//    else{
+//        print_error_message(ret);
+//    }
+///* sgx code end */    
 }
 
 /*
@@ -3836,23 +3850,23 @@ enum delta_result_type do_add_delta(conn *c, const char *key, const size_t nkey,
         return NON_NUMERIC;
     }
 
-/* begin sgx code */
-    sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-    int cyx_flag, cyx_vlen;
-    char *sgx_buf;
-    cyx_flag = 0;
-//    cyx_vlen = 0;
-    sgx_buf = ptr;
-    cyx_vlen = strlen(sgx_buf);
-    ret = ecall_encl1_update_operation(global_eid, sgx_buf, &cyx_flag, &cyx_vlen, sgx_buf, sgx_buf);
-    if (ret == SGX_SUCCESS){
-        printf("SGX Enclave arithmetic success.\n");
-      //  printf("dec_len:%d\n",dec_len);
-    }
-    else{
-        print_error_message(ret);
-    }
-/* end sgx code*/
+///* begin sgx code */
+//    sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+//    int cyx_flag, cyx_vlen;
+//    char *sgx_buf;
+//    cyx_flag = 0;
+////    cyx_vlen = 0;
+//    sgx_buf = ptr;
+//    cyx_vlen = strlen(sgx_buf);
+//    ret = ecall_encl1_update_operation(global_eid, sgx_buf, &cyx_flag, &cyx_vlen, sgx_buf, sgx_buf);
+//    if (ret == SGX_SUCCESS){
+//        printf("SGX Enclave arithmetic success.\n");
+//      //  printf("dec_len:%d\n",dec_len);
+//    }
+//    else{
+//        print_error_message(ret);
+//    }
+///* end sgx code*/
 
     if (incr) {
         value += delta;

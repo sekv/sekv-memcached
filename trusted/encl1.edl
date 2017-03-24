@@ -15,6 +15,6 @@ enclave {
     trusted {
     	    public void ecall_encl1_AES_GCM_decrypt([in,string]const char *p_src, uint32_t src_len, [out,count=100]char *p_dec, [out]uint32_t *dec_len);
 
-            public void ecall_encl1_update_operation([in,string]char *key, [in]int *flag, [in]int *vlen, [in,out,string]char *value, [in,string]char *value_update);
+            public void ecall_encl1_update_operation([in,string]char *key, [in]int *flag, [in]int *vlen, [in,out,size=tlen]char *value, [in,string]char *value_update, int tlen);
     };
 };

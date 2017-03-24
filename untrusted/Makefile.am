@@ -3,7 +3,7 @@ pkginclude_HEADERS = protocol_binary.h
 noinst_PROGRAMS = memcached-debug sizes testapp timedrun
 
 SGX_SDK = /home/cheng/sgxsdk
-SGX_MODE = HW
+SGX_MODE = SIM
 
 #SGX_COMMON_CFLAGS := -Werror=missing-prototypes -Wno-variadic-macros -Werror=format= -Werror=unused-result -Werror=pedantic
 SGX_COMMON_CFLAGS := -Wno-error -Wno-variadic-macros
@@ -11,13 +11,13 @@ SGX_LIBRARY_PATH := $(SGX_SDK)/lib64
 SGX_ENCLAVE_SIGNER := $(SGX_SDK)/bin/x64/sgx_sign
 SGX_EDGER8R := $(SGX_SDK)/bin/x64/sgx_edger8r
 
-Urts_Library_Name := sgx_urts
+Urts_Library_Name := sgx_urts_sim
 
 App_Include_Paths := -IInclude -I$(SGX_SDK)/include
 App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wno-attributes $(App_Include_Paths) 
 
 App_Link_Flags := -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread -L/usr/local/libevent/include
-App_Link_Flags += -lsgx_uae_service -lcrypto
+App_Link_Flags += -lsgx_uae_service_sim -lcrypto
 
 
 BUILT_SOURCES=

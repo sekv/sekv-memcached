@@ -141,18 +141,18 @@ NROFF = nroff
 MANS = $(man_MANS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/cheng/git-sekv/sekv-memcached/untrusted/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/missing autoconf
-AUTOHEADER = ${SHELL} /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/missing autoheader
-AUTOMAKE = ${SHELL} /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/missing automake-1.14
+AUTOCONF = ${SHELL} /home/cheng/git-sekv/sekv-memcached/untrusted/missing autoconf
+AUTOHEADER = ${SHELL} /home/cheng/git-sekv/sekv-memcached/untrusted/missing autoheader
+AUTOMAKE = ${SHELL} /home/cheng/git-sekv/sekv-memcached/untrusted/missing automake-1.14
 AWK = mawk
 CC = gcc -std=gnu99
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2 -pthread -pthread -Wall -Werror -pedantic -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls
 CPP = gcc -E
-CPPFLAGS = -I/usr/local/libevent/include 
+CPPFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -170,11 +170,11 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = -L/usr/local/libevent/lib  -Wl,-rpath,/usr/local/libevent/lib
+LDFLAGS = 
 LIBOBJS = 
 LIBS = -levent 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/missing makeinfo
+MAKEINFO = ${SHELL} /home/cheng/git-sekv/sekv-memcached/untrusted/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = memcached
@@ -194,10 +194,10 @@ STRIP =
 VERSION = 1.4.34
 XML2RFC = no
 XSLTPROC = no
-abs_builddir = /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/doc
-abs_srcdir = /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/doc
-abs_top_builddir = /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted
-abs_top_srcdir = /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted
+abs_builddir = /home/cheng/git-sekv/sekv-memcached/untrusted/doc
+abs_srcdir = /home/cheng/git-sekv/sekv-memcached/untrusted/doc
+abs_top_builddir = /home/cheng/git-sekv/sekv-memcached/untrusted
+abs_top_srcdir = /home/cheng/git-sekv/sekv-memcached/untrusted
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -224,7 +224,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/install-sh
+install_sh = ${SHELL} /home/cheng/git-sekv/sekv-memcached/untrusted/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -487,10 +487,10 @@ uninstall-man: uninstall-man1
 
 
 protocol-binary.txt: protocol-binary.full
-	no -c /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/doc protocol-binary.full $@
+	no -c /home/cheng/git-sekv/sekv-memcached/untrusted/doc protocol-binary.full $@
 
 protocol-binary-range.txt: protocol-binary-range.full
-	no -c /home/cheng/workspace/mySGX/sgx/enclave_encl1/untrusted/doc protocol-binary-range.full $@
+	no -c /home/cheng/git-sekv/sekv-memcached/untrusted/doc protocol-binary-range.full $@
 
 protocol-binary.full: protocol-binary.xml xml2rfc/rfc2629-noinc.xsl
 	no --nonet xml2rfc/rfc2629-noinc.xsl protocol-binary.xml > $@

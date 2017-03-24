@@ -14,6 +14,7 @@ typedef struct ms_ecall_encl1_update_operation_t {
 	int* ms_vlen;
 	char* ms_value;
 	char* ms_value_update;
+	int ms_tlen;
 } ms_ecall_encl1_update_operation_t;
 
 typedef struct ms_ocall_encl1_sample_t {
@@ -49,7 +50,7 @@ sgx_status_t ecall_encl1_AES_GCM_decrypt(sgx_enclave_id_t eid, const char* p_src
 	return status;
 }
 
-sgx_status_t ecall_encl1_update_operation(sgx_enclave_id_t eid, char* key, int* flag, int* vlen, char* value, char* value_update)
+sgx_status_t ecall_encl1_update_operation(sgx_enclave_id_t eid, char* key, int* flag, int* vlen, char* value, char* value_update, int tlen)
 {
 	sgx_status_t status;
 	ms_ecall_encl1_update_operation_t ms;
@@ -58,6 +59,7 @@ sgx_status_t ecall_encl1_update_operation(sgx_enclave_id_t eid, char* key, int* 
 	ms.ms_vlen = vlen;
 	ms.ms_value = value;
 	ms.ms_value_update = value_update;
+	ms.ms_tlen = tlen;
 	status = sgx_ecall(eid, 1, &ocall_table_encl1, &ms);
 	return status;
 }
